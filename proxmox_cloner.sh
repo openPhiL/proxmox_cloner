@@ -36,6 +36,8 @@ for i in "${container[@]}"
 do
     echo "---- processing container $i ----------"
     
+    snap_local=$(/usr/sbin/zfs get written |grep subvol-$i |grep daily | tail -1 | awk '{print $1}')
+    echo "latest local snapshot: $snap_local"
     snap_remote=$(/usr/bin/ssh $SpareProxmox zfs get written |grep subvol-$i |grep daily | tail -1 | awk '{print $1}')
     echo "latest remote snapshot: $snap_remote"
 
@@ -48,8 +50,6 @@ do
         scp /etc/pve/nodes/$local_hostname/lxc/$i.conf $SpareProxmox:/etc/pve/nodes/$remote_hostname/lxc/$i.conf
 
     else
-        snap_local=$(/usr/sbin/zfs get written |grep subvol-$i |grep daily | tail -1 | awk '{print $1}')
-        echo "latest local snapshot: $snap_local"
 
         if [[ $snap_remote == $snap_local ]]
         then
@@ -78,6 +78,8 @@ for i in "${vms[@]}"
 do
     echo "---- processing VM $i ----------"
 
+    snap_local=$(/usr/sbin/zfs get written |grep vm-$i |grep daily | tail -1 | awk '{print $1}')
+    echo "latest local snapshot: $snap_local"
     snap_remote=$(/usr/bin/ssh $SpareProxmox zfs get written |grep vm-$i |grep daily | tail -1 | awk '{print $1}')
     echo "latest remote snapshot: $snap_remote"
 
@@ -92,8 +94,6 @@ do
         scp /etc/pve/nodes/$local_hostname/qemu-server/$i.conf $SpareProxmox:/etc/pve/nodes/$remote_hostname/qemu-server/$i.conf
 
     else
-        snap_local=$(/usr/sbin/zfs get written |grep vm-$i |grep daily | tail -1 | awk '{print $1}')
-        echo "latest local snapshot: $snap_local"
 
         if [[ $snap_remote == $snap_local ]]
         then
